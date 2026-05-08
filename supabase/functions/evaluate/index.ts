@@ -38,8 +38,17 @@ const evaluationTool = {
           type: ["string", "null"],
           enum: ["solution-first", "list-maker", "vague-goal-setter", null],
         },
+        barAssessment: {
+          type: "string",
+          enum: ["below", "borderline", "at", "above"],
+          description: "How the candidate's answer compares to this company's hiring bar for this role.",
+        },
+        barReason: {
+          type: "string",
+          description: "One sentence explaining the bar assessment, referencing specific dimension gaps or strengths.",
+        },
       },
-      required: ["scores", "probe", "probeType", "probeArchetype"],
+      required: ["scores", "probe", "probeType", "probeArchetype", "barAssessment", "barReason"],
       additionalProperties: false,
     },
   },
@@ -71,6 +80,7 @@ Deno.serve(async (req) => {
     const role = String(body?.role ?? "PM");
     const question = String(body?.question ?? "");
     const answer = String(body?.answer ?? "");
+    const dimensionWeights = body?.dimensionWeights ?? null;
 
     if (!VALID_TYPES.has(interviewType)) {
       return json({ error: "Invalid interviewType" }, 400);
@@ -90,13 +100,31 @@ Deno.serve(async (req) => {
       SPM: "SPM Level: Score strictly. They must demonstrate strategic thinking, organizational leadership, and deep tradeoff awareness. Average answers should get a 2."
     }[role] || "";
 
+    // Build company-calibrated weight instructions
+    const weightLabels: Record<string, string> = {
+      problemFraming: "Problem Framing",
+      userEmpathy: "User Empathy",
+      prioritizationRationale: "Prioritization Rationale",
+      metricDefinition: metricLabel,
+      tradeoffAwareness: "Trade-off Awareness",
+    };
+    let weightBlock = "";
+    if (dimensionWeights && typeof dimensionWeights === "object") {
+      const lines = Object.entries(weightLabels).map(([key, label]) => {
+        const w = (dimensionWeights as Record<string, number>)[key] ?? 3;
+        const tag = w >= 5 ? "CRITICAL" : w >= 4 ? "HIGH" : w >= 3 ? "MODERATE" : "LOW";
+        return `- ${label}: importance ${w}/5 (${tag})`;
+      });
+      weightBlock = `\nCOMPANY-SPECIFIC CALIBRATION for ${companyName}:\nThis company weights dimensions differently in real interviews:\n${lines.join("\n")}\nWhen a highly-weighted dimension scores low, flag it prominently in barReason.\nWhen a low-weight dimension scores low, note it but don't penalize as harshly.\n`;
+    }
+
     const systemPrompt = `You are a brutally honest senior PM interviewer at ${companyName} evaluating a ${role}-level candidate's ${interviewType} answer.
 
 Score 1-5 on each dimension. Be HONEST — most real PM answers score 2-3. A 5 is exceptional and rare. A 1 is missing entirely. Do not be generous.
 
 ROLE CALIBRATION:
 ${roleCalibration}
-
+${weightBlock}
 Dimensions:
 - Problem Framing: Did they restate, scope, clarify the problem before solutioning?
 - User Empathy: Did they identify a specific user/segment with real pain?
@@ -111,6 +139,13 @@ Then craft ONE follow-up probe:
   - "list-maker": listed many options without prioritizing or justifying
   - "vague-goal-setter": talked outcomes without concrete metrics
 The probe must be one short interviewer-style question. No preamble.
+
+Finally, assess the candidate against ${companyName}'s hiring bar for ${role}:
+- "below": would not pass this round
+- "borderline": weak pass or on the fence
+- "at": solid pass, meets expectations
+- "above": strong performance, exceeds the bar
+Provide a one-sentence barReason referencing specific dimension gaps or strengths.
 
 Call submit_evaluation with the result.`;
 

@@ -20,6 +20,10 @@ Deno.serve(async (req) => {
     const interviewCulture = String(body?.interviewCulture ?? "");
     const roleContext = String(body?.roleContext ?? "");
     const sampleQuestions = Array.isArray(body?.sampleQuestions) ? body.sampleQuestions : [];
+    const drillDimension = body?.drillDimension ?? null;
+    const isFollowUp = body?.isFollowUp === true;
+    const originalQuestion = String(body?.originalQuestion ?? "");
+    const previousProbes = Array.isArray(body?.previousProbes) ? body.previousProbes : [];
 
     if (!VALID_TYPES.has(interviewType)) {
       return new Response(JSON.stringify({ error: "Invalid interviewType" }), {
@@ -36,11 +40,41 @@ Deno.serve(async (req) => {
       });
     }
 
-    const sampleQsText = sampleQuestions.length > 0 
-      ? `REFERENCE QUESTIONS (for style/depth calibration — do NOT copy these):\n${sampleQuestions.join('\n')}`
-      : "";
+    let systemPrompt: string;
 
-    const systemPrompt = `You are a senior PM interviewer at ${companyName}.
+    if (isFollowUp && originalQuestion) {
+      // Follow-up probe mode for mock interviews
+      const probeHistory = previousProbes
+        .map((p: { probe: string; response: string }, i: number) =>
+          `Probe ${i + 1}: ${p.probe}\nCandidate response: ${p.response}`)
+        .join("\n\n");
+
+      systemPrompt = `You are continuing a PM interview at ${companyName} for a ${role}-level candidate.
+The candidate has already answered the main question and been probed ${previousProbes.length} time(s).
+
+Original question: ${originalQuestion}
+
+Previous probes and responses:
+${probeHistory}
+
+Rules:
+- Ask ONE follow-up probe that pushes deeper into a weakness or explores a new angle.
+- Do NOT repeat the same angle as a previous probe.
+- If the candidate improved on the probed dimension, acknowledge briefly then shift to a new weakness.
+- If they didn't improve, push harder with a concrete scenario.
+- Return only the probe question text. Nothing else.`;
+
+    } else {
+      // Standard question generation (calibrate, drill, mock initial)
+      const sampleQsText = sampleQuestions.length > 0
+        ? `REFERENCE QUESTIONS (for style/depth calibration — do NOT copy these):\n${sampleQuestions.join('\n')}`
+        : "";
+
+      const drillBlock = drillDimension
+        ? `\nDRILL MODE: This question must specifically test the candidate's "${drillDimension}" ability. Design the question so that a strong answer REQUIRES demonstrating this dimension clearly.\n`
+        : "";
+
+      systemPrompt = `You are a senior PM interviewer at ${companyName}.
 Your job is to ask one ${interviewType} interview question calibrated for a ${role}-level candidate.
 
 COMPANY CONTEXT:
@@ -53,7 +87,7 @@ ROLE EXPECTATIONS (${role}):
 ${roleContext}
 
 ${sampleQsText}
-
+${drillBlock}
 Rules:
 - Ask exactly one question. No preamble, no explanation.
 - The question must be answerable in 5-10 minutes verbally.
@@ -63,6 +97,7 @@ Rules:
   - SPM: Strategic, multi-product, P&L-level thinking. Expect vision.
 - Do not copy the reference questions. Generate a new one in the same style.
 - Return only the question text. Nothing else.`;
+    }
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
