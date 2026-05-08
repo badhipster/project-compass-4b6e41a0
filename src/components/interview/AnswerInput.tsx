@@ -7,7 +7,7 @@ interface Props {
   disabled?: boolean;
 }
 
-const MIN_CHARS = 150;
+const MIN_CHARS = 15;
 const MAX_CHARS = 4000;
 
 export function AnswerInput({ onSubmit, disabled }: Props) {

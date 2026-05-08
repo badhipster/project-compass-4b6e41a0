@@ -383,8 +383,8 @@ const Mock = () => {
 function ProbeResponseInput({ onSubmit }: { onSubmit: (text: string) => void }) {
   const [text, setText] = useState("");
   const handleSubmit = () => {
-    if (text.trim().length < 50) {
-      toast.error("Please provide a more detailed response (at least 50 characters).");
+    if (text.trim().length < 15) {
+      toast.error("Please provide a more detailed response (at least 15 characters).");
       return;
     }
     onSubmit(text.trim());
@@ -400,8 +400,8 @@ function ProbeResponseInput({ onSubmit }: { onSubmit: (text: string) => void }) 
         className="w-full rounded-xl border border-border bg-card p-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
       />
       <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground">{text.length} chars (min 50)</p>
-        <Button size="sm" onClick={handleSubmit} disabled={text.trim().length < 50}>
+        <p className="text-xs text-muted-foreground">{text.length} chars (min 15)</p>
+        <Button size="sm" onClick={handleSubmit} disabled={text.trim().length < 15}>
           Submit response
         </Button>
       </div>

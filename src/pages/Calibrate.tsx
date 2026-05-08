@@ -18,8 +18,8 @@ import { StepIndicator } from "@/components/interview/StepIndicator";
 import { track } from "@/lib/track";
 import { getCompanyById } from "@/lib/companies";
 import { saveSession, getSessionCount, getDimensionAverages, getWeakestDimension } from "@/lib/profile";
-import { dimensionShortLabel } from "@/types/interview";
-import type { EvaluationResult, InterviewType, SessionStep, Role } from "@/types/interview";
+import { dimensionShortLabel, DIMENSION_KEYS } from "@/types/interview";
+import type { EvaluationResult, InterviewType, SessionStep, Role, Scores } from "@/types/interview";
 
 const Calibrate = () => {
   const [step, setStep] = useState<SessionStep>("setup");
@@ -29,7 +29,9 @@ const Calibrate = () => {
   const [question, setQuestion] = useState("");
   const [generating, setGenerating] = useState(false);
   const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null);
+  const [probeEvaluation, setProbeEvaluation] = useState<EvaluationResult | null>(null);
   const [submittingAnswer, setSubmittingAnswer] = useState(false);
+  const [submittingProbe, setSubmittingProbe] = useState(false);
   const [sessionSaved, setSessionSaved] = useState(false);
 
   const reset = () => {
@@ -39,6 +41,7 @@ const Calibrate = () => {
     setRole(null);
     setQuestion("");
     setEvaluation(null);
+    setProbeEvaluation(null);
     setSessionSaved(false);
   };
 
@@ -109,18 +112,46 @@ const Calibrate = () => {
     }
   };
 
-  const handleSubmitProbe = (response: string) => {
+  const handleSubmitProbe = async (response: string) => {
+    if (!interviewType || !company || !role || !evaluation) return;
     track("probe_answered", { char_count: response.length, mode: "calibrate" });
 
-    // Save session to localStorage
-    if (evaluation && company && role && interviewType && !sessionSaved) {
+    // Re-evaluate with probe context
+    setSubmittingProbe(true);
+    try {
+      const companyData = getCompanyById(company);
+      const combinedAnswer = `Original answer evaluated above.\n\nFollow-up probe: "${evaluation.probe}"\n\nCandidate's follow-up response: ${response}`;
+      const { data, error } = await supabase.functions.invoke("evaluate", {
+        body: {
+          interviewType,
+          company,
+          role,
+          question,
+          answer: combinedAnswer,
+          dimensionWeights: companyData?.dimensionWeights,
+        },
+      });
+      if (error) throw error;
+      const result = data as EvaluationResult;
+      if (result?.scores) {
+        setProbeEvaluation(result);
+      }
+    } catch {
+      // If re-evaluation fails, just proceed silently
+    } finally {
+      setSubmittingProbe(false);
+    }
+
+    // Save session to localStorage (using best available scores)
+    const finalScores = probeEvaluation?.scores ?? evaluation.scores;
+    if (company && role && interviewType && !sessionSaved) {
       saveSession({
         company,
         role,
         interviewType,
         mode: "calibrate",
-        scores: evaluation.scores,
-        barAssessment: evaluation.barAssessment ?? "borderline",
+        scores: finalScores,
+        barAssessment: probeEvaluation?.barAssessment ?? evaluation.barAssessment ?? "borderline",
         probeCount: 1,
       });
       setSessionSaved(true);
@@ -131,6 +162,14 @@ const Calibrate = () => {
   const sessionCount = getSessionCount();
   const avgs = getDimensionAverages();
   const weakest = getWeakestDimension();
+
+  // Score comparison helper
+  const getScoreDelta = (dim: keyof Scores): number | null => {
+    if (!evaluation?.scores || !probeEvaluation?.scores) return null;
+    const before = evaluation.scores[dim]?.score ?? 0;
+    const after = probeEvaluation.scores[dim]?.score ?? 0;
+    return after - before;
+  };
 
   if (!supabaseConfigured) {
     return (
@@ -257,12 +296,61 @@ const Calibrate = () => {
               </div>
             )}
 
-            <ProbeCard probe={evaluation.probe} onSubmit={handleSubmitProbe} />
+            <ProbeCard probe={evaluation.probe} onSubmit={handleSubmitProbe} submitting={submittingProbe} />
           </div>
         )}
 
         {step === "done" && (
           <div className="space-y-8 animate-fade-up">
+            {/* Show score comparison if probe was re-evaluated */}
+            {probeEvaluation && evaluation && (
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-soft-sm">
+                <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-4">
+                  Score Comparison: Before → After Follow-Up
+                </h3>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-5">
+                  {DIMENSION_KEYS.map(dim => {
+                    const before = evaluation.scores[dim]?.score ?? 0;
+                    const after = probeEvaluation.scores[dim]?.score ?? 0;
+                    const delta = getScoreDelta(dim);
+                    return (
+                      <div key={dim} className="rounded-xl border border-border bg-secondary/30 p-3 text-center">
+                        <p className="text-xs font-medium text-muted-foreground mb-1">
+                          {dimensionShortLabel(dim)}
+                        </p>
+                        <div className="flex items-center justify-center gap-1.5">
+                          <span className="text-lg font-bold text-foreground/60">{before}</span>
+                          <span className="text-xs text-muted-foreground">→</span>
+                          <span className="text-lg font-bold text-foreground">{after}</span>
+                          {delta !== null && delta !== 0 && (
+                            <span className={`text-xs font-semibold ${delta > 0 ? "text-green-600" : "text-red-500"}`}>
+                              {delta > 0 ? `+${delta}` : delta}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                {/* Updated bar assessment */}
+                {probeEvaluation.barAssessment && (
+                  <div className={`mt-4 rounded-xl border p-3 ${
+                    probeEvaluation.barAssessment === "above" ? "border-green-200 bg-green-50" :
+                    probeEvaluation.barAssessment === "at" ? "border-blue-200 bg-blue-50" :
+                    probeEvaluation.barAssessment === "borderline" ? "border-amber-200 bg-amber-50" :
+                    "border-red-200 bg-red-50"
+                  }`}>
+                    <p className="text-sm font-semibold text-foreground">
+                      Updated bar: <span className="capitalize">{probeEvaluation.barAssessment}</span> the hiring bar
+                    </p>
+                    {probeEvaluation.barReason && (
+                      <p className="mt-1 text-xs text-foreground/70">{probeEvaluation.barReason}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-soft-sm">
               <h2 className="text-xl font-bold text-foreground">Session saved</h2>
               <p className="mt-2 text-sm text-muted-foreground">

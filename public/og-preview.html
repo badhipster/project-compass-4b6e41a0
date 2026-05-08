@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    background: #1E293B;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Subtle grid texture */
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* Blue accent glow top-right */
+  body::after {
+    content: '';
+    position: absolute;
+    top: -120px;
+    right: -120px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    padding: 72px 80px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo {
+    width: 48px;
+    height: 48px;
+    background: #3B82F6;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -1px;
+    flex-shrink: 0;
+  }
+
+  .site-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #94A3B8;
+    letter-spacing: 0.02em;
+  }
+
+  .middle {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 0;
+  }
+
+  .eyebrow {
+    font-size: 15px;
+    font-weight: 600;
+    color: #3B82F6;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 64px;
+    font-weight: 800;
+    color: #F8FAFC;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+    max-width: 780px;
+  }
+
+  .tagline {
+    font-size: 22px;
+    font-weight: 400;
+    color: #94A3B8;
+    line-height: 1.5;
+    max-width: 620px;
+  }
+
+  .bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pills {
+    display: flex;
+    gap: 12px;
+  }
+
+  .pill {
+    background: rgba(59,130,246,0.12);
+    border: 1px solid rgba(59,130,246,0.25);
+    border-radius: 100px;
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #60A5FA;
+    letter-spacing: 0.01em;
+  }
+
+  .score-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-end;
+  }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .score-label {
+    font-size: 12px;
+    color: #64748B;
+    font-weight: 500;
+    width: 160px;
+    text-align: right;
+  }
+
+  .score-bar-bg {
+    width: 120px;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .score-bar {
+    height: 100%;
+    background: #3B82F6;
+    border-radius: 3px;
+  }
+
+  .score-num {
+    font-size: 12px;
+    color: #60A5FA;
+    font-weight: 700;
+    width: 24px;
+    text-align: right;
+  }
+</style>
+</head>
+<body>
+  <div class="content">
+    <div class="top">
+      <div class="logo">PM</div>
+      <span class="site-name">PM Interview Prep Coach</span>
+    </div>
+
+    <div class="middle">
+      <div class="eyebrow">Free · No signup · Instant feedback</div>
+      <h1>Honest AI feedback for PM interviews</h1>
+      <p class="tagline">Company-calibrated questions, scoring across five PM dimensions, and one follow-up probe like a real interviewer.</p>
+    </div>
+
+    <div class="bottom">
+      <div class="pills">
+        <div class="pill">15 companies</div>
+        <div class="pill">4 interview types</div>
+        <div class="pill">5-dimension rubric</div>
+      </div>
+      <div class="score-preview">
+        <div class="score-row">
+          <span class="score-label">Problem Framing</span>
+          <div class="score-bar-bg"><div class="score-bar" style="width:80%"></div></div>
+          <span class="score-num">4</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">User Empathy</span>
+          <div class="score-bar-bg"><div class="score-bar" style="width:60%"></div></div>
+          <span class="score-num">3</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Prioritization</span>
+          <div class="score-bar-bg"><div class="score-bar" style="width:100%"></div></div>
+          <span class="score-num">5</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Metric Definition</span>
+          <div class="score-bar-bg"><div class="score-bar" style="width:60%"></div></div>
+          <span class="score-num">3</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Trade-off Awareness</span>
+          <div class="score-bar-bg"><div class="score-bar" style="width:80%"></div></div>
+          <span class="score-num">4</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

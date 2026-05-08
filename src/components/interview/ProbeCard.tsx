@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Info } from "lucide-react";
+import { Info, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -21,8 +21,8 @@ export function ProbeCard({ probe, onSubmit, submitting }: Props) {
       <p className="mt-5 flex items-start gap-2 text-xs italic leading-relaxed text-muted-foreground">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
         <span>
-          One probe, targeted at your weakest dimension. Real interviewers probe — no other AI coach
-          does this in an async, structured flow.
+          Respond to the follow-up probe. Your answer will be re-evaluated to show whether your
+          second attempt improved your weakest dimension.
         </span>
       </p>
 
@@ -34,17 +34,22 @@ export function ProbeCard({ probe, onSubmit, submitting }: Props) {
           id="probe-textarea"
           value={value}
           onChange={(e) => setValue(e.target.value.slice(0, 2000))}
-          placeholder="Respond as you would in the room. No minimum length…"
+          placeholder="Respond as you would in the room…"
           className="mt-3 min-h-[180px] w-full resize-y rounded-xl border border-input bg-card p-5 text-[15px] leading-[1.7] text-foreground outline-none placeholder:text-muted-foreground/50 transition-all duration-200 focus-visible:border-primary focus-visible:shadow-soft focus-visible:ring-2 focus-visible:ring-primary/15"
           disabled={submitting}
         />
-        <div className="mt-6 flex justify-end">
+        <div className="mt-6 flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">
+            {value.trim().length > 0 ? `${value.trim().length} chars` : ""}
+          </p>
           <Button
             onClick={() => onSubmit(value.trim())}
-            disabled={submitting}
+            disabled={submitting || value.trim().length < 10}
             className="h-11 px-8 shadow-soft-sm transition-shadow hover:shadow-soft"
           >
-            End Session
+            {submitting ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Evaluating…</>
+            ) : "Submit & Score"}
           </Button>
         </div>
       </div>

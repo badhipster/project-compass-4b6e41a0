@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
     }
     if (!companyName) return json({ error: "Missing company" }, 400);
     if (!question) return json({ error: "Missing question" }, 400);
-    if (answer.length < 150) return json({ error: "Answer too short" }, 400);
+    if (answer.length < 15) return json({ error: "Answer too short" }, 400);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) return json({ error: "LOVABLE_API_KEY not configured" }, 500);
