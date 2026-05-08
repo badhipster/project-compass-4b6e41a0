@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Lightbulb, CheckSquare, Target, Database, Layers, Network, Users, Code2, Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -7,23 +7,30 @@ import { SiteFooter } from "@/components/SiteFooter";
 const Section = ({
   number,
   title,
+  icon: Icon,
   children,
 }: {
   number: string;
   title: string;
+  icon: any;
   children: React.ReactNode;
 }) => (
-  <section className="border-t border-border py-14 first:border-t-0 first:pt-0 sm:py-16">
-    <div className="grid grid-cols-1 gap-8 sm:grid-cols-[120px_1fr]">
+  <section className="border-t border-border py-14 first:border-t-0 first:pt-0 sm:py-16 group">
+    <div className="grid grid-cols-1 gap-8 sm:grid-cols-[160px_1fr]">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-          {number}
-        </p>
-        <h2 className="mt-2 text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary ring-1 ring-primary/20">
+            <Icon className="h-4 w-4" />
+          </div>
+          <p className="text-xs font-bold uppercase tracking-widest text-primary">
+            {number}
+          </p>
+        </div>
+        <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
           {title}
         </h2>
       </div>
-      <div className="space-y-4 text-[15px] leading-[1.75] text-foreground">
+      <div className="space-y-5 text-[15px] leading-[1.75] text-muted-foreground">
         {children}
       </div>
     </div>
@@ -55,7 +62,7 @@ const Method = () => {
         </header>
 
         {/* SECTIONS */}
-        <Section number="01" title="The core thesis">
+        <Section number="01" title="The core thesis" icon={Lightbulb}>
           <p>
             Most PM interview prep tools treat sessions as{" "}
             <span className="font-medium text-foreground">disposable</span>. You answer a question,
@@ -69,29 +76,35 @@ const Method = () => {
             consistently weak, whether you're improving, and where you stand relative to a
             specific company's hiring bar.
           </p>
-          <p>
-            The architecture is built around three modes that serve different moments in a
-            candidate's prep journey:
-          </p>
-          <ul className="mt-2 space-y-3 pl-1">
-            <li>
-              <span className="font-semibold text-foreground">Calibrate (~5 min).</span> One question,
-              scored on all five dimensions. The diagnostic baseline. "Where do I stand right now?"
-            </li>
-            <li>
-              <span className="font-semibold text-foreground">Drill (~3 min/rep).</span> Pick your
-              weakest dimension, get targeted questions that test only that skill. Rapid-fire
-              repetition. "How do I fix my specific weakness?"
-            </li>
-            <li>
-              <span className="font-semibold text-foreground">Mock (~15 min).</span> Full interview
-              simulation with 2-3 adaptive follow-up probes and a detailed debrief with company-calibrated
-              bar assessment. "Am I ready for this specific company?"
-            </li>
-          </ul>
+          
+          <div className="mt-6 rounded-xl border border-border/40 bg-secondary/30 p-5 shadow-inner">
+             <div className="flex items-center justify-between border-b border-border/40 pb-3 mb-3">
+               <span className="text-xs font-semibold text-foreground uppercase tracking-wider">The Arc</span>
+               <span className="text-[10px] text-muted-foreground uppercase">Data Flow</span>
+             </div>
+             <div className="flex flex-col sm:flex-row gap-4 justify-between items-center text-center">
+               <div className="flex-1">
+                 <div className="h-2 w-12 bg-primary/20 rounded mx-auto mb-2" />
+                 <span className="text-xs font-medium text-foreground">Calibrate</span>
+                 <p className="text-[10px] text-muted-foreground mt-1">Baseline measurement</p>
+               </div>
+               <ArrowRight className="h-4 w-4 text-muted-foreground rotate-90 sm:rotate-0" />
+               <div className="flex-1">
+                 <div className="h-2 w-12 bg-amber-500/20 rounded mx-auto mb-2" />
+                 <span className="text-xs font-medium text-foreground">Drill</span>
+                 <p className="text-[10px] text-muted-foreground mt-1">Targeted repetition</p>
+               </div>
+               <ArrowRight className="h-4 w-4 text-muted-foreground rotate-90 sm:rotate-0" />
+               <div className="flex-1">
+                 <div className="h-2 w-12 bg-emerald-500/20 rounded mx-auto mb-2" />
+                 <span className="text-xs font-medium text-foreground">Mock</span>
+                 <p className="text-[10px] text-muted-foreground mt-1">Full simulation</p>
+               </div>
+             </div>
+          </div>
         </Section>
 
-        <Section number="02" title="Why these five dimensions">
+        <Section number="02" title="Why these five dimensions" icon={CheckSquare}>
           <p>
             Generic AI interview coaches grade you on{" "}
             <span className="font-medium text-foreground">clarity, confidence, and filler-word
@@ -128,17 +141,13 @@ const Method = () => {
               acknowledge what you were giving up? This is what separates a 4 from a 5.
             </li>
           </ul>
-          <p>
-            For Behavioral interviews, "Metric Definition" is rephrased as "Outcome Clarity",
-            because the dimension still applies but the language differs.
-          </p>
         </Section>
 
-        <Section number="03" title="The intelligence layer: company-calibrated scoring">
+        <Section number="03" title="The intelligence layer" icon={Target}>
           <p>
             <span className="font-semibold text-foreground">The key differentiator is not the
             questions — it's the scoring calibration.</span> Every company in the system has a set
-            of proprietary metadata that influences how the LLM evaluates your answer:
+            of proprietary metadata that influences how the AI evaluates your answer:
           </p>
           <ul className="mt-2 space-y-3 pl-1">
             <li>
@@ -153,39 +162,18 @@ const Method = () => {
               An SPM candidate at Google scoring 3/5 avg may be "borderline", while the same score at
               a Series B startup is "above".
             </li>
-            <li>
-              <span className="font-semibold text-foreground">Interview Structure.</span>{" "}
-              How many rounds, what each round covers, and what the format looks like (case study vs.
-              whiteboard vs. take-home). This metadata is surfaced in the company selector so candidates
-              know what they're preparing for.
-            </li>
           </ul>
-          <p>
-            When a highly-weighted dimension scores low, the evaluator flags it prominently in the bar
-            assessment reason. When a low-weight dimension scores low, it's noted but doesn't
-            tank the overall bar assessment as harshly.
-          </p>
           <p>
             <span className="font-semibold text-foreground">Why a curated list of 15 and not free
-            text input?</span> Two reasons:
+            text input?</span> Hallucination control. An LLM
+            given "make me a question for a fintech startup" will invent generic questions. Given
+            "Razorpay APM, Product Sense, here is the company's actual context and three real
+            past questions", it produces an actual, highly calibrated diagnostic output. Adding a 16th means writing all of that properly. This is a quality signal,
+            not a quantity signal.
           </p>
-          <ul className="mt-2 space-y-3 pl-1">
-            <li>
-              <span className="font-semibold text-foreground">Hallucination control.</span> An LLM
-              given "make me a question for a fintech startup" will invent generic questions. Given
-              "Razorpay APM, Product Sense, here is the company's actual context and three real
-              past questions", it produces something usable.
-            </li>
-            <li>
-              <span className="font-semibold text-foreground">Quality bar.</span> Every company in
-              the list has been hand-curated with dimension weights, hiring bars, and interview
-              structure. Adding a 16th means writing all of that properly. This is a quality signal,
-              not a quantity signal.
-            </li>
-          </ul>
         </Section>
 
-        <Section number="04" title="Session memory: localStorage as a design decision">
+        <Section number="04" title="Session memory & local storage" icon={Database}>
           <p>
             Every session is persisted in the browser's localStorage. The profile system tracks:
           </p>
@@ -202,35 +190,17 @@ const Method = () => {
               <span className="font-semibold text-foreground">Drill suggestions.</span> Your
               weakest dimension is automatically suggested when entering Drill mode.
             </li>
-            <li>
-              <span className="font-semibold text-foreground">Calibration reports.</span> After 3+
-              sessions, the Profile page generates a summary with actionable recommendations.
-            </li>
           </ul>
           <p>
             <span className="font-semibold text-foreground">Why localStorage and not a database?</span>{" "}
-            Three reasons:
+            Zero friction. No signup wall.
+            The competitor is ChatGPT — instant, no auth. Adding a login screen before the first
+            session loses on the only axis where this tool beats ChatGPT. Secondly, privacy by default. Session
+            data never leaves the browser.
           </p>
-          <ul className="mt-2 space-y-3 pl-1">
-            <li>
-              <span className="font-semibold text-foreground">Zero friction.</span> No signup wall.
-              The competitor is ChatGPT — instant, no auth. Adding a login screen before the first
-              session loses on the only axis where this tool beats ChatGPT.
-            </li>
-            <li>
-              <span className="font-semibold text-foreground">Privacy by default.</span> Session
-              data never leaves the browser. No server knows what you scored or which companies
-              you're targeting.
-            </li>
-            <li>
-              <span className="font-semibold text-foreground">Ship now, optimize later.</span>{" "}
-              If this scales, the migration path is clear: add optional auth, sync localStorage to
-              a database, enable cross-device access. The data model is already structured for this.
-            </li>
-          </ul>
         </Section>
 
-        <Section number="05" title="The three modes: why not just one flow">
+        <Section number="05" title="The three modes" icon={Layers}>
           <p>
             V1 had a single linear flow: pick type → pick company → answer → score → probe.
             User testing revealed three problems:
@@ -246,18 +216,14 @@ const Method = () => {
               weakness.</span> If you know your Metric Definition is weak, you had to play through
               the full flow and hope the question tested that dimension.
             </li>
-            <li>
-              <span className="font-semibold text-foreground">No progression arc.</span> Every
-              session felt the same. No connection between Tuesday's session and Thursday's.
-            </li>
           </ul>
           <p>
-            The three modes solve these by offering different time commitments and learning
+            The three modes (Calibrate, Drill, Mock) solve these by offering different time commitments and learning
             objectives, while the shared session history creates the longitudinal arc.
           </p>
         </Section>
 
-        <Section number="06" title="The adaptive probe system">
+        <Section number="06" title="The adaptive probe system" icon={Network}>
           <p>
             Real PM interviews have probes. The interviewer hears your answer and pokes at the
             weakest part: "What about users who don't have smartphones?", "How would you measure
@@ -274,20 +240,18 @@ const Method = () => {
           </p>
           <ul className="mt-2 space-y-3 pl-1">
             <li>
-              <span className="font-semibold text-foreground">Isolated weakness (probeType: "isolated").</span>{" "}
-              One dimension is clearly the lowest (≥1 point below the next). The probe targets
-              that specific weakness.
+              <span className="font-semibold text-foreground">Isolated weakness.</span>{" "}
+              One dimension is clearly the lowest. The probe targets that specific weakness.
             </li>
             <li>
-              <span className="font-semibold text-foreground">Thematic pattern (probeType: "thematic").</span>{" "}
+              <span className="font-semibold text-foreground">Thematic pattern.</span>{" "}
               Multiple weaknesses cluster into a behavioral pattern. The system identifies three
-              archetypes: "solution-first" (skipped problem framing), "list-maker" (listed without
-              prioritizing), "vague-goal-setter" (no concrete metrics).
+              archetypes: "solution-first", "list-maker", or "vague-goal-setter".
             </li>
           </ul>
         </Section>
 
-        <Section number="07" title="Who this is built for">
+        <Section number="07" title="Who this is built for" icon={Users}>
           <p>
             Two primary personas drove every design decision:
           </p>
@@ -295,65 +259,39 @@ const Method = () => {
             <li>
               <span className="font-semibold text-foreground">Riya — the Repeat Practitioner.</span>{" "}
               APM interviewing at 6-8 companies. Uses Calibrate for baseline, Drill for weakness
-              targeting, and Mock before final-round prep. Wants short sessions on mobile,
-              calibrated to her target companies. The reason there's no signup wall and Drill
-              mode exists.
+              targeting, and Mock before final-round prep. Wants short sessions on mobile.
             </li>
             <li>
               <span className="font-semibold text-foreground">Karan — the Calibration Seeker.</span>{" "}
               SWE transitioning to PM. Wants one honest read on whether his thinking meets bar.
-              Uses Calibrate 3 times to get a calibration report, then decides whether to keep
-              practicing or pivot his strategy. The reason the bar assessment exists and the
-              rubric is honest by design.
+              Uses Calibrate 3 times to get a calibration report.
             </li>
           </ul>
           <p>
-            Both personas are India-based, which is why the company list skews India-first (10
-            India tech, 5 global with India hiring). The interview culture, hiring bars, and
+            Both personas are India-based, which is why the company list skews India-first. The interview culture, hiring bars, and
             dimension weights reflect Indian PM interview patterns specifically.
           </p>
         </Section>
 
-        <Section number="08" title="Stack and tradeoffs">
+        <Section number="08" title="Stack and tradeoffs" icon={Code2}>
           <p>
             Vite + React + TypeScript on the frontend, Tailwind and shadcn/ui for the design system,
             Supabase Edge Functions for the LLM calls. Three functional endpoints: question generation,
             scoring + probe, and follow-up probe generation for Mock mode.
           </p>
           <p>
-            <span className="font-semibold text-foreground">Why not Next.js?</span> No SSR or SEO
-            requirement for a single-purpose tool used by people who arrived from a direct link.
-            Vite ships smaller and builds faster.
-          </p>
-          <p>
             <span className="font-semibold text-foreground">Why Edge Functions over a Node server?</span>{" "}
             Latency, cost, and zero infra to manage. The LLM call is the only server-side work
             needed.
           </p>
-          <p>
-            <span className="font-semibold text-foreground">Why localStorage over a database?</span>{" "}
-            Session memory requires zero friction at entry. Adding auth before the first session
-            loses on the only axis where this beats ChatGPT. The data model is structured to
-            migrate to a database if optional auth is added later.
-          </p>
         </Section>
 
-        <Section number="09" title="What 'Pro' would be, and why I'd cut it that way">
+        <Section number="09" title="What 'Pro' would be" icon={Banknote}>
           <p>
             This is a portfolio project. There is no Pro tier and no paywall. But the right
             question for any product is{" "}
             <span className="italic text-foreground">"if you were going to monetize this, how would
-            you cut it?"</span>{" "}
-            Here's that thinking.
-          </p>
-          <p>
-            <span className="font-semibold text-foreground">Why pure B2C freemium fails for
-            interview prep:</span> retention drops to zero the day a candidate signs an offer.
-            Lifetime is 4-12 weeks. Churn is the goal of the product. CAC for "PM candidate" is
-            high.
-          </p>
-          <p>
-            <span className="font-semibold text-foreground">What I'd actually build:</span>
+            you cut it?"</span>
           </p>
           <ul className="mt-2 space-y-3 pl-1">
             <li>
@@ -365,11 +303,6 @@ const Method = () => {
               <span className="font-semibold text-foreground">B2B to bootcamps and MBA career
               services.</span> Per-seat licensing. They already have rubrics and want async tools
               for their cohorts. Higher ACV, longer LTV, slower sales cycle.
-            </li>
-            <li>
-              <span className="font-semibold text-foreground">White-label to existing coaching
-              firms.</span> The moat is the company intelligence layer and the diagnostic scoring
-              calibration, not the audience.
             </li>
           </ul>
         </Section>

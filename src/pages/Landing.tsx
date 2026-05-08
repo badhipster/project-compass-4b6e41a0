@@ -206,6 +206,76 @@ const Landing = () => {
               No signup. No paywall. Session data stays in your browser.
             </p>
           </div>
+
+          {/* HERO GRAPHIC UI */}
+          <div className="mx-auto mt-16 max-w-4xl animate-fade-up" style={{ animationDelay: "150ms" }}>
+            <div className="relative rounded-2xl border border-border/50 bg-card/30 p-2 backdrop-blur-xl shadow-2xl sm:p-4">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] to-indigo-500/[0.03] rounded-2xl" aria-hidden="true" />
+              
+              {/* Fake browser/app chrome */}
+              <div className="flex items-center gap-1.5 px-3 pb-3 pt-1">
+                <div className="h-2.5 w-2.5 rounded-full bg-border" />
+                <div className="h-2.5 w-2.5 rounded-full bg-border" />
+                <div className="h-2.5 w-2.5 rounded-full bg-border" />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_300px]">
+                {/* Left panel: Score breakdown */}
+                <div className="rounded-xl border border-border/40 bg-background/50 p-5 shadow-inner">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-semibold text-foreground">Diagnostic Results</h3>
+                    <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">Mock Session</span>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {[
+                      { name: "Problem Framing", score: 4, width: "80%" },
+                      { name: "User Empathy", score: 2, width: "40%", isWeak: true },
+                      { name: "Prioritization Rationale", score: 3, width: "60%" },
+                      { name: "Metric Definition", score: 4, width: "80%" },
+                      { name: "Trade-off Awareness", score: 3, width: "60%" },
+                    ].map(dim => (
+                      <div key={dim.name} className="flex items-center gap-3">
+                        <div className="w-32 shrink-0 text-xs text-muted-foreground">{dim.name}</div>
+                        <div className="h-2 flex-1 overflow-hidden rounded-full bg-secondary/50">
+                          <div 
+                            className={`h-full rounded-full ${dim.isWeak ? 'bg-amber-500' : 'bg-primary'}`} 
+                            style={{ width: dim.width }} 
+                          />
+                        </div>
+                        <div className="w-4 text-right text-xs font-medium text-foreground">{dim.score}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right panel: Adaptive Probe */}
+                <div className="flex flex-col gap-4">
+                  <div className="flex-1 rounded-xl border border-border/40 bg-background/50 p-5 shadow-inner">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Target className="h-4 w-4 text-amber-500" />
+                      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Targeted Probe</h3>
+                    </div>
+                    <p className="text-sm leading-relaxed text-foreground">
+                      "You mentioned building for 'all shoppers'. Which specific segment experiences the pain of cart abandonment the most, and why target them first?"
+                    </p>
+                    <div className="mt-3 inline-flex items-center gap-1.5 rounded bg-amber-500/10 px-2 py-1 text-[10px] font-medium text-amber-600">
+                      <Crosshair className="h-3 w-3" />
+                      Testing User Empathy
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-border/40 bg-background/50 p-4 shadow-inner flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Hiring Bar</h3>
+                      <p className="text-sm font-medium text-foreground mt-0.5">Borderline</p>
+                    </div>
+                    <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin-slow" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* THREE MODES */}
