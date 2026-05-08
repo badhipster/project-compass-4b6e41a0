@@ -118,6 +118,7 @@ const Calibrate = () => {
 
     // Re-evaluate with probe context
     setSubmittingProbe(true);
+    let newResult: EvaluationResult | null = null;
     try {
       const companyData = getCompanyById(company);
       const combinedAnswer = `Original answer evaluated above.\n\nFollow-up probe: "${evaluation.probe}"\n\nCandidate's follow-up response: ${response}`;
@@ -135,6 +136,7 @@ const Calibrate = () => {
       const result = data as EvaluationResult;
       if (result?.scores) {
         setProbeEvaluation(result);
+        newResult = result;
       }
     } catch {
       // If re-evaluation fails, just proceed silently
@@ -143,7 +145,9 @@ const Calibrate = () => {
     }
 
     // Save session to localStorage (using best available scores)
-    const finalScores = probeEvaluation?.scores ?? evaluation.scores;
+    const finalScores = newResult?.scores ?? evaluation.scores;
+    const finalBar = newResult?.barAssessment ?? evaluation.barAssessment ?? "borderline";
+    
     if (company && role && interviewType && !sessionSaved) {
       saveSession({
         company,
@@ -151,7 +155,7 @@ const Calibrate = () => {
         interviewType,
         mode: "calibrate",
         scores: finalScores,
-        barAssessment: probeEvaluation?.barAssessment ?? evaluation.barAssessment ?? "borderline",
+        barAssessment: finalBar,
         probeCount: 1,
       });
       setSessionSaved(true);
